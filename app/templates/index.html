@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="ru" data-bs-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Орбита: курсы валют и астероиды</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700&family=Manrope:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/app.css') }}" rel="stylesheet">
+</head>
+<body>
+<div class="sky" aria-hidden="true"></div>
+<main class="container py-4 py-lg-5">
+  <header class="hero mb-4 mb-lg-5">
+    <p class="brand mb-2"><span class="brand-dot"></span>Орбита</p>
+    <h1>Курсы валют<br>и гости из космоса</h1>
+    <p class="lead-sm">Официальный курс Национального банка Молдовы и астероиды, пролетающие рядом с Землёй, в одном окне.</p>
+  </header>
+
+  <ul class="nav nav-pills orbit-tabs mb-4" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="tab-fx" data-bs-toggle="pill" data-bs-target="#pane-fx" data-hash="#fx" type="button" role="tab">Конвертер валют</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="tab-neo" data-bs-toggle="pill" data-bs-target="#pane-neo" data-hash="#neo" type="button" role="tab">Астероиды NASA</button>
+    </li>
+  </ul>
+
+  <div class="tab-content">
+    <!-- Конвертер -->
+    <section class="tab-pane fade show active" id="pane-fx" role="tabpanel">
+      <div class="row g-4">
+        <div class="col-lg-7">
+          <form id="convertForm" class="panel p-4 p-md-5" novalidate>
+            <label for="amount" class="form-label">Сумма</label>
+            <input id="amount" class="form-control form-control-lg amount-input" inputmode="decimal" autocomplete="off" placeholder="100">
+            <div id="amountError" class="invalid-feedback" role="alert"></div>
+
+            <div class="row g-3 align-items-end mt-2">
+              <div class="col-5">
+                <label for="from" class="form-label">Отдаёте</label>
+                <select id="from" class="form-select form-select-lg"></select>
+              </div>
+              <div class="col-2 text-center">
+                <button type="button" id="swapBtn" class="btn btn-outline-light swap" aria-label="Поменять валюты местами">⇄</button>
+              </div>
+              <div class="col-5">
+                <label for="to" class="form-label">Получаете</label>
+                <select id="to" class="form-select form-select-lg"></select>
+              </div>
+            </div>
+
+            <button id="convertBtn" class="btn btn-amber btn-lg w-100 mt-4" type="submit" disabled>Конвертировать</button>
+            <button id="retryRates" type="button" class="btn btn-outline-light w-100 mt-2" hidden>Повторить загрузку курсов</button>
+          </form>
+        </div>
+
+        <div class="col-lg-5">
+          <div class="panel p-4 p-md-5 h-100 d-flex flex-column">
+            <div id="result" hidden class="mb-4">
+              <p id="resultFrom" class="text-muted mb-1"></p>
+              <p id="resultValue" class="result-value mb-2"></p>
+              <p id="resultRate" class="text-muted mb-0"></p>
+            </div>
+            <p id="resultHint" class="text-muted mb-4">Введите сумму и выберите валюты. Результат появится здесь.</p>
+            <div id="curAlert" class="alert" role="status" hidden></div>
+            <dl id="curMeta" class="meta mt-auto mb-0" hidden>
+              <div><dt>Источник</dt><dd id="curSource"></dd></div>
+              <div><dt>Дата курса</dt><dd><span id="curDate"></span> <span id="curBadge" class="badge rounded-pill"></span></dd></div>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Астероиды -->
+    <section class="tab-pane fade" id="pane-neo" role="tabpanel">
+      <form id="neoForm" class="panel p-4 mb-4" novalidate>
+        <div class="row g-3 align-items-end">
+          <div class="col-md-5">
+            <label for="neoDate" class="form-label">Дата (ГГГГ-ММ-ДД)</label>
+            <input id="neoDate" class="form-control form-control-lg" placeholder="2026-10-27" autocomplete="off" maxlength="10">
+            <div id="dateError" class="invalid-feedback" role="alert"></div>
+          </div>
+          <div class="col-6 col-md-3"><button type="button" id="todayBtn" class="btn btn-outline-light btn-lg w-100">Сегодня</button></div>
+          <div class="col-6 col-md-4"><button id="neoBtn" type="submit" class="btn btn-amber btn-lg w-100">Получить данные</button></div>
+        </div>
+      </form>
+
+      <div id="neoAlert" class="alert mb-4" role="status" hidden></div>
+
+      <div id="neoSummary" class="row g-3 mb-4" hidden>
+        <div class="col-4"><div class="tile"><span id="sumCount" class="tile-n"></span><span class="tile-l">астероидов</span></div></div>
+        <div class="col-4"><div class="tile tile-hazard"><span id="sumHazard" class="tile-n"></span><span class="tile-l">потенциально опасных</span></div></div>
+        <div class="col-4"><div class="tile"><span id="sumClosest" class="tile-n"></span><span class="tile-l">ближайший пролёт</span></div></div>
+      </div>
+
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+        <dl id="neoMeta" class="meta meta-row mb-0" hidden>
+          <div><dt>Источник</dt><dd id="neoSource"></dd></div>
+          <div><dt>Дата данных</dt><dd><span id="neoShownDate"></span> <span id="neoBadge" class="badge rounded-pill"></span></dd></div>
+          <div><dt>Ответ получен</dt><dd id="neoStamp"></dd></div>
+        </dl>
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="onlyHazard">
+          <label class="form-check-label" for="onlyHazard">Только опасные</label>
+        </div>
+      </div>
+
+      <div id="neoList" class="neo-grid"><p class="empty">Выберите дату и нажмите «Получить данные».</p></div>
+    </section>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='js/logic.js') }}"></script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
