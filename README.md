@@ -1,3 +1,6 @@
+<img width="1280" height="607" alt="image" src="https://github.com/user-attachments/assets/2ca12a9f-932b-434f-a7c4-92d8c385cdaa" />
+<img width="1280" height="717" alt="image" src="https://github.com/user-attachments/assets/69cf774d-4946-49e1-85f7-08d262d5e8fa" />
+
 # Орбита: конвертер валют НБМ + трекер астероидов NASA
 
 Веб-приложение на Python (Flask) с интерфейсом на Bootstrap 5.
